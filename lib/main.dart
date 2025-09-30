@@ -14,8 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.pinkAccent),
         useMaterial3: true,
       ),
 
@@ -34,11 +33,24 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-
+  DateTime selectedDate = DateTime.now();
   void _incrementCounter() {
     setState(() {
       _counter++;
     });
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
   }
 
   @override
@@ -49,16 +61,14 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: SingleChildScrollView( // Ditambahkan agar bisa di-scroll jika konten terlalu panjang
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               const MyImageWidget(),
               const SizedBox(height: 16),
-              const Text(
-                'You have pushed the button this many times:',
-              ),
+              const Text('You have pushed the button this many times:'),
               Text(
                 '$_counter',
                 style: Theme.of(context).textTheme.headlineMedium,
@@ -74,7 +84,28 @@ class _MyHomePageState extends State<MyHomePage> {
               const SizedBox(height: 8),
               const CupertinoActivityIndicator(),
 
-              // <--- PERUBAHAN: Tombol untuk memunculkan dialog
+              const SizedBox(height: 24),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 32.0),
+                child: TextField(
+                  obscureText: false,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Nama',
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              const Text("Contoh Date Picker:"),
+              Text("${selectedDate.toLocal()}".split(' ')[0]),
+              const SizedBox(
+                height: 8.0,
+              ),
+              ElevatedButton(
+                onPressed: () => _selectDate(context),
+                child: const Text('Pilih Tanggal'),
+              ),
+
               const SizedBox(height: 24),
               ElevatedButton(
                 child: const Text('Show alert'),
@@ -87,11 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
 
-      bottomNavigationBar: BottomAppBar(
-        child: Container(
-          height: 50.0,
-        ),
-      ),
+      bottomNavigationBar: BottomAppBar(child: Container(height: 50.0)),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment Counter',
@@ -103,7 +130,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-// <--- PERUBAHAN: Fungsi untuk menampilkan dialog dari Langkah 4
 showAlertDialog(BuildContext context) {
   // set up the button
   Widget okButton = TextButton(
@@ -117,9 +143,7 @@ showAlertDialog(BuildContext context) {
   AlertDialog alert = AlertDialog(
     title: const Text("My title"),
     content: const Text("This is my message."),
-    actions: [
-      okButton,
-    ],
+    actions: [okButton],
   );
 
   // show the dialog
