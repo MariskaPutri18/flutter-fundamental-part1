@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart'; // <<< Import ini wajib ditambahkan
-import 'basic_widget/loading_cupertino.dart';
-import 'basic_widget/fab_widget.dart';
+import 'package:flutter/cupertino.dart';
+import 'basic_widget/image_widget.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,41 +11,122 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // MaterialApp diperlukan meskipun menggunakan widget Cupertino
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(primarySwatch: Colors.indigo),
-      home: Scaffold(
-        appBar: AppBar(title: const Text('My Increment App')),
-        body: Center(
-          child: Container(
-            margin: const EdgeInsets.only(top: 30),
-            padding: const EdgeInsets.all(20),
-            color: Colors.white,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                // Cupertino Button (Sekarang berfungsi karena ada import cupertino.dart)
-                CupertinoButton(
-                  child: const Text("Contoh Cupertino Button (Main App)"),
-                  onPressed: () {
-                    // ignore: avoid_print
-                    print("Button ditekan!");
-                  },
-                  color: CupertinoColors.systemBlue,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                const SizedBox(height: 30),
+      theme: ThemeData(
 
-                // Memanggil LoadingCupertino yang telah diimpor
-                const Text("Contoh Widget yang Diimpor:", style: TextStyle(fontSize: 16)),
-                const LoadingCupertino(), 
-                
-              ],
-            ),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
+        useMaterial3: true,
+      ),
+
+      home: const MyHomePage(title: 'My Increment App'),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  int _counter = 0;
+
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(widget.title),
+      ),
+      body: Center(
+        child: SingleChildScrollView( // Ditambahkan agar bisa di-scroll jika konten terlalu panjang
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const MyImageWidget(),
+              const SizedBox(height: 16),
+              const Text(
+                'You have pushed the button this many times:',
+              ),
+              Text(
+                '$_counter',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              const SizedBox(height: 24),
+              const Text('Contoh Widget Cupertino:'),
+              const SizedBox(height: 8),
+              CupertinoButton(
+                color: Colors.blue,
+                child: const Text("Contoh button"),
+                onPressed: () {},
+              ),
+              const SizedBox(height: 8),
+              const CupertinoActivityIndicator(),
+
+              // <--- PERUBAHAN: Tombol untuk memunculkan dialog
+              const SizedBox(height: 24),
+              ElevatedButton(
+                child: const Text('Show alert'),
+                onPressed: () {
+                  showAlertDialog(context);
+                },
+              ),
+            ],
           ),
         ),
       ),
+
+      bottomNavigationBar: BottomAppBar(
+        child: Container(
+          height: 50.0,
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment Counter',
+        child: const Icon(Icons.add),
+      ),
+
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
+}
+
+// <--- PERUBAHAN: Fungsi untuk menampilkan dialog dari Langkah 4
+showAlertDialog(BuildContext context) {
+  // set up the button
+  Widget okButton = TextButton(
+    child: const Text("OK"),
+    onPressed: () {
+      Navigator.pop(context);
+    },
+  );
+
+  // set up the AlertDialog
+  AlertDialog alert = AlertDialog(
+    title: const Text("My title"),
+    content: const Text("This is my message."),
+    actions: [
+      okButton,
+    ],
+  );
+
+  // show the dialog
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
+  );
 }
